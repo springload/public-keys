@@ -38,6 +38,6 @@ jobs:
       - name: circleci workflow
         id: circleci
         run: |
-          curl --location --request POST 'https://circleci.com/api/v2/project/github/springload/backup-a-saurus/pipeline' \
-          --header 'Content-Type: application/json' \
+          curl 'https://circleci.com/api/v1.1/project/github/springload/backup-a-saurus/tree/master' \
+          -d 'build_parameters[CIRCLE_JOB]=build' \
           -u "${API_TOKEN}:"
