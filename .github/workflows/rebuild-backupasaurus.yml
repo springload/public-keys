@@ -4,7 +4,7 @@ on:
     types: [ closed ]
 
 jobs:
-  check:
+  check-gpg-changed:
     runs-on: ubuntu-latest
     outputs:
       gpg_modified: ${{ steps.modified_dirs.outputs.gpg_modified }}
