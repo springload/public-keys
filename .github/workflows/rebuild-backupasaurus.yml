@@ -1,0 +1,43 @@
+name: Backup-a-saurus
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      gpg_modified: ${{ steps.modified_dirs.outputs.gpg_modified }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: check modified directories
+        id: modified_dirs
+        run: |
+          CMD="git diff --name-only HEAD^ HEAD"
+          echo "Modified files:"
+          $CMD
+
+          # Check if gpg dir has been modified
+          MODIFIED=$($CMD gpg)
+          if [[ -n "${MODIFIED}" ]]; then
+            echo "Trigger docker build"
+            echo "::set-output name=gpg_modified::true"
+          else
+            echo "::set-output name=gpg_modified::false"
+          fi
+
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    needs: check-gpg-changed
+    if: github.event.pull_request.merged == true && needs.check.outputs.gpg_modified == true
+    env:
+      API_TOKEN: ${{ secrets.CIRCLECI_API_TOKEN }}
+    steps:
+      - name: circleci workflow
+        id: circleci
+        run: |
+          curl 'https://circleci.com/api/v1.1/project/github/springload/backup-a-saurus/tree/master' \
+          -d 'build_parameters[CIRCLE_JOB]=build' \
+          -u "${API_TOKEN}:"
