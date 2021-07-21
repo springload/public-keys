@@ -33,7 +33,7 @@ jobs:
   trigger-rebuild:
     runs-on: ubuntu-latest
     needs: check-gpg-changed
-    if: github.event.pull_request.merged == true && needs.check-gpg-changed.outputs.gpg_modified == true
+    if: github.event.pull_request.merged == true && needs.check-gpg-changed.outputs.gpg_modified == 'true'
     env:
       API_TOKEN: ${{ secrets.CIRCLECI_API_TOKEN }}
     steps:
