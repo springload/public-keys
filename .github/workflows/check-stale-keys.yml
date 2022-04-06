@@ -1,0 +1,54 @@
+name: Check stale keys
+on:
+  schedule:
+    - cron: '0 10 * * 1'
+  #  push trigger for testing - remove before merge
+  push:
+
+jobs:
+#  Would be good to run this on a schedule rather than PR?
+  check-for-stale-keys:
+    runs-on: ubuntu-latest
+    outputs:
+      ssh_stale: ${{ steps.stale_files.outputs.ssh_stale }}
+      old_keys: ${{ steps.stale_files.outputs.ssh_stale }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: check stale files
+        id: stale_files
+        run: |
+          git ls-tree -r --name-only HEAD | while read filename; do
+           [[ "$(git log -1 --format="%at" -- $filename)" < "$(gdate  --date='2 years ago' +%s)"  ]] && echo "$(git log -1 --format="%ad" --date=format:'%Y-%m-%dT%H:%M:%S%z' -- $filename) $filename"
+          done >> old_keys.txt
+          OLD_KEYS=$(cat old_keys.txt | tr '\n' '; ')
+
+          echo "::set-output name=old_keys::$OLD_KEYS"
+          if [ -s old_keys.txt ]; then
+            # The file is not-empty.
+            # Notify via slack?
+            echo "::set-output name=ssh_stale::true"
+
+          else
+            # The file is empty.
+            echo "::set-output name=ssh_stale::false"
+          fi
+
+  notify-for-stale-keys:
+    runs-on: ubuntu-latest
+    if: needs.check-for-stale-keys.outputs.ssh_stale == 'true'
+    steps:
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          # Slack channel id, channel name, or user id to post message.
+          # See also: https://api.slack.com/methods/chat.postMessage#channels
+          channel-id: 'dev'
+          # For posting a simple plain text message
+          slack-message: "Stale ssh keys:\n ${{ needs.check-for-stale-keys.outputs.old_keys }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
