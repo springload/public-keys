@@ -4,6 +4,45 @@ on:
     types: [ closed ]
 
 jobs:
+#  Would be good to run this on a schedule rather than PR?
+  check-for-stale-keys:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: check modified directories
+        id: modified_dirs
+        run: |
+          git ls-tree -r --name-only HEAD | while read filename; do
+           [[ "$(git log -1 --format="%at" -- $filename)" < "$(gdate  --date='2 years ago' +%s)"  ]] && echo "$(git log -1 --format="%ad" --date=format:'%Y-%m-%dT%H:%M:%S%z' -- $filename) $filename"
+          done >> old_keys.txt
+
+          if [ -s old_keys.txt ]; then
+            # The file is not-empty.
+            # Notify via slack?
+          else
+            # The file is empty.
+            # Do nothing
+          fi
+
+#          Need to get the old_keys.txt content into the slack notification payload below...
+
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.18.0
+        if: ${{ <expression> }}
+        with:
+          # Slack channel id, channel name, or user id to post message.
+          # See also: https://api.slack.com/methods/chat.postMessage#channels
+          channel-id: 'CHANNEL_ID'
+          # For posting a simple plain text message
+          slack-message: "Stale ssh keys:\n ${{ env.MY_VARIABLE }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
   check-gpg-changed:
     runs-on: ubuntu-latest
     outputs:
