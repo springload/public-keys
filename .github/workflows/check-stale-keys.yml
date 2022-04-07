@@ -55,8 +55,10 @@ jobs:
         with:
           # Slack channel id, channel name, or user id to post message.
           # See also: https://api.slack.com/methods/chat.postMessage#channels
-          channel-id: 'dev'
-          # For posting a simple plain text message
-          slack-message: "Stale ssh keys:\n ${{ needs.check-for-stale-keys.outputs.old_keys }}"
+          payload: |
+            {
+              "channel-id": "dev",
+              "slack-message": "Stale ssh keys:\n ${{ needs.check-for-stale-keys.outputs.old_keys }}"
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
