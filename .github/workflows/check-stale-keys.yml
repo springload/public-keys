@@ -41,6 +41,7 @@ jobs:
 
   notify-for-stale-keys:
     runs-on: ubuntu-latest
+    needs: check-for-stale-keys
     if: needs.check-for-stale-keys.outputs.ssh_stale == 'true'
     steps:
       - name: Post to a Slack channel
