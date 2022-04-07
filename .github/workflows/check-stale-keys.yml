@@ -59,4 +59,4 @@ jobs:
           # For posting a simple plain text message
           slack-message: "Stale ssh keys:\n ${{ needs.check-for-stale-keys.outputs.old_keys }}"
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK_URL }}
