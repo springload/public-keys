@@ -53,11 +53,8 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.18.0
         with:
-          # Slack channel id, channel name, or user id to post message.
-          # See also: https://api.slack.com/methods/chat.postMessage#channels
           payload: |
             {
-              "channel-id": "dev",
               "slack-message": "Stale ssh keys:\n ${{ needs.check-for-stale-keys.outputs.old_keys }}"
             }
         env:
