@@ -1,12 +1,10 @@
 name: Check stale keys
 on:
   schedule:
-    - cron: '0 10 * * 1'
-  #  push trigger for testing - remove before merge
-  push:
+    # 11 pm UTC -> 10/11 am NZ, Tuesdays
+    - cron: '0 23 * * 2'
 
 jobs:
-#  Would be good to run this on a schedule rather than PR?
   check-for-stale-keys:
     runs-on: ubuntu-latest
     outputs:
@@ -30,7 +28,7 @@ jobs:
           OLD_KEYS=$(\
             cat old_keys.txt |\
             grep -v eugene_authorized_keys |\
-            tr '\n' '; '\
+            tr '\n' ';'\
           )
 
           echo "::set-output name=old_keys::$OLD_KEYS"
