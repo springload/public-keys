@@ -1,6 +1,6 @@
 name: Check encryption key
 on:
-  push
+  pull_request
 
 jobs:
   check-encryption-keys:
