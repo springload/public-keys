@@ -12,6 +12,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check encryption keys
+        shell: bash {0}
         run: |
           keyfiles=$(ls gpg/*)
           faillist=""
