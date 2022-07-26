@@ -21,7 +21,7 @@ jobs:
             tmpkeys=$(mktemp)
             tmpfile=$(mktemp)
 
-            OPTS="--no-default-keyring --keyring $tmpkeys"
+            OPTS="--no-default-keyring --keyring $tmpkeys --no-auto-key-locate"
             gpg $OPTS --quiet --import $key
 
             recipient=$(gpg $OPTS --list-keys --with-colons | grep uid | cut -d: -f 10 | sed -r 's/^.*<(.*)>$/\1/'| sort -u)
