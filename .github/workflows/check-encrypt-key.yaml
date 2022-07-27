@@ -1,0 +1,39 @@
+name: Check encryption key
+on:
+  pull_request
+
+jobs:
+  check-encryption-keys:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check encryption keys
+        shell: bash {0}
+        run: |
+          keyfiles=$(ls gpg/*)
+          faillist=""
+
+          for key in $keyfiles; do
+            tmpkeys=$(mktemp)
+            tmpfile=$(mktemp)
+
+            OPTS="--no-default-keyring --keyring $tmpkeys --no-auto-key-locate"
+            gpg $OPTS --quiet --import $key
+
+            recipient=$(gpg $OPTS --list-keys --with-colons | grep uid | cut -d: -f 10 | sed -r 's/^.*<(.*)>$/\1/'| sort -u)
+
+            echo "Checking $key"
+            gpg $OPTS -e --trust-model always -r "$recipient" "$tmpfile"
+            if [[ $? -ne 0 ]]; then
+              faillist="$faillist\n$recipient"
+              echo "Key contained in $key is not valid for encryption"
+            fi
+          done
+
+          rm $tmpkeys $tmpfile
+
+          if [[ -n $faillist ]]; then echo -e "\nThe following keys are not valid:$faillist"; exit 1; fi
