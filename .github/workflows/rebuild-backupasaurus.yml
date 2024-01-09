@@ -37,6 +37,7 @@ jobs:
     steps:
       - name: Backup-a-saurus workflow
         run: |
+          set -e
           curl \
           -X POST \
           -H "Accept: application/vnd.github.+json" \
