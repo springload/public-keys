@@ -6,6 +6,6 @@ Staff can add their public [ssh](ssh) and [gpg](gpg) keys for use with our vario
 
 Here are our guidelines on creating [here](https://github.com/springload/wiki/blob/master/sysadmin-team/key-management/ssh-key-rotation.md).
 
-And here are the instructions on how to [work from home](https://github.com/springload/wiki/blob/master/sysadmin-team/wfh-ssh-config).
+And here are the instructions on how to [work from home](https://handbook.springload.co.nz/tech-team/key-management/ssh/).
 
 Details of backup systems can be found [here](https://github.com/springload/wiki/blob/master/sysadmin-team/infrastructure-manual/backups.md).
